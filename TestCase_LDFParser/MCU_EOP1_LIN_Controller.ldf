@@ -1,0 +1,233 @@
+/*
+************************************************************************************************************************
+*                                                Myunghwa IND. CO., LTD
+*
+*                                           (c) Copyright 2018; Myunghwa IND.
+*                                                  ALL RIGHTS RESERVED.
+*
+* Filename        : iEWP_LIN_Controller.ldf
+* Project         : iEWP
+* Created         : 2018/01/12
+* Description     : LIN Description File 
+* 
+* 
+************************************************************************************************************************
+* Revison History:
+* YYYY/MM/DD             Version              Description                      Author
+* 2018/01/12             v0.1                 Draft first version              Hyungsuk.kim & Youngchan.song
+* 2018/01/19             v0.2                 Modify Signal_representation     Hyungsuk.kim & Youngchan.song
+*
+************************************************************************************************************************
+*/
+
+LIN_description_file;
+LIN_protocol_version = "2.1";
+LIN_language_version = "2.1";
+LIN_speed = 19.2 kbps;
+
+Nodes {
+  Master: LinMaster, 10 ms, 0.1 ms ;
+  Slaves: Eop ;
+}
+
+Signals {
+  Eop_Target_Spd_RPM: 8, 0, LinMaster, Eop ;
+  Eop_Comm_Error: 1, 0, Eop, LinMaster ;
+  Eop_FaultStatus: 1, 0, Eop, LinMaster ;
+  Eop_ActRotSpd_rpm: 8, 0, Eop, LinMaster ;
+  Eop_Version: 8, 0, Eop, LinMaster ;
+  Eop_EEPROM_POPUP: 8, 0, Eop, LinMaster ;
+  Eop_Current_DC: 8, 0, Eop, LinMaster ;
+  Eop_Current_Iq: 8, 0, Eop, LinMaster ;
+  Eop_GateDrv_UV_OV: 1, 0, Eop, LinMaster ;
+  Eop_Short_Circuit: 1, 0, Eop, LinMaster ;
+  Eop_Over_Voltage: 1, 0, Eop, LinMaster ;
+  Eop_Under_Voltage: 1, 0, Eop, LinMaster ;
+  Eop_Over_Current: 1, 0, Eop, LinMaster ;
+  Eop_Low_Current: 1, 0, Eop, LinMaster ;
+  Eop_Warn_Temp: 1, 0, Eop, LinMaster ;
+  Eop_Over_Temp: 1, 0, Eop, LinMaster ;
+  Eop_Speed_Error: 1, 0, Eop, LinMaster ;
+  Eop_Torque: 6, 0, Eop, LinMaster ;
+  Eop_ProtectMode: 1, 0, Eop, LinMaster ;
+}
+
+Diagnostic_signals {
+  MasterReqB0: 8, 0 ;
+  MasterReqB1: 8, 0 ;
+  MasterReqB2: 8, 0 ;
+  MasterReqB3: 8, 0 ;
+  MasterReqB4: 8, 0 ;
+  MasterReqB5: 8, 0 ;
+  MasterReqB6: 8, 0 ;
+  MasterReqB7: 8, 0 ;
+  SlaveRespB0: 8, 0 ;
+  SlaveRespB1: 8, 0 ;
+  SlaveRespB2: 8, 0 ;
+  SlaveRespB3: 8, 0 ;
+  SlaveRespB4: 8, 0 ;
+  SlaveRespB5: 8, 0 ;
+  SlaveRespB6: 8, 0 ;
+  SlaveRespB7: 8, 0 ;
+}
+
+
+
+Frames {
+  COMMAND_EOP: 39, LinMaster, 8 {
+    Eop_Target_Spd_RPM, 24 ;
+  }
+  STATUS_EOP: 58, Eop, 8 {
+    Eop_FaultStatus, 0 ;
+    Eop_ProtectMode, 1 ;
+    Eop_ActRotSpd_rpm, 8 ;
+    Eop_Version, 16 ;
+    Eop_EEPROM_POPUP, 24 ;
+    Eop_Current_DC, 32 ;
+    Eop_Current_Iq, 40 ;
+    Eop_Short_Circuit, 48 ;
+    Eop_GateDrv_UV_OV, 49 ;
+    Eop_Torque, 50 ;
+    Eop_Speed_Error, 56 ;
+    Eop_Over_Temp, 57 ;
+    Eop_Warn_Temp, 58 ;
+    Eop_Low_Current, 59 ;
+    Eop_Over_Current, 60 ;
+    Eop_Under_Voltage, 61 ;
+    Eop_Over_Voltage, 62 ;
+    Eop_Comm_Error, 63 ;
+  }
+}
+
+
+
+Diagnostic_frames {
+  MasterReq: 0x3c {
+    MasterReqB0, 0 ;
+    MasterReqB1, 8 ;
+    MasterReqB2, 16 ;
+    MasterReqB3, 24 ;
+    MasterReqB4, 32 ;
+    MasterReqB5, 40 ;
+    MasterReqB6, 48 ;
+    MasterReqB7, 56 ;
+  }
+  SlaveResp: 0x3d {
+    SlaveRespB0, 0 ;
+    SlaveRespB1, 8 ;
+    SlaveRespB2, 16 ;
+    SlaveRespB3, 24 ;
+    SlaveRespB4, 32 ;
+    SlaveRespB5, 40 ;
+    SlaveRespB6, 48 ;
+    SlaveRespB7, 56 ;
+  }
+}
+
+Node_attributes {
+  Eop{
+    LIN_protocol = "2.1" ;
+    configured_NAD = 0x11 ;
+    initial_NAD = 0x11 ;
+    product_id = 0x2193, 0x7E9, 2 ;
+    response_error = Eop_Comm_Error ;
+    P2_min = 150 ms ;
+    ST_min = 50 ms ;
+    N_As_timeout = 1000 ms ;
+    N_Cr_timeout = 1000 ms ;
+    configurable_frames {
+      STATUS_EOP ;
+      COMMAND_EOP ;
+    }
+  }
+}
+
+Schedule_tables {
+ BusActiveNomal {
+    COMMAND_EOP delay 50 ms ;
+    STATUS_EOP delay 50 ms ;
+  }
+}
+
+
+Signal_encoding_types {
+  Eop_ActSpd_rpm_t {
+    physical_value, 0, 255, 20, 0, "RPM" ;
+  }
+  Eop_Comm_Error_t {
+    physical_value, 0, 1, 1, 0, "Flag" ;
+  }
+  Eop_Current_DC_t {
+    physical_value, 0, 255, 0.25, 0, "Amean" ;
+  }
+  Eop_Current_Iq_t {
+    physical_value, 0, 255, 0.25, 0, "Apeak" ;
+  }
+  Eop_EEPROM_POPUP_t {
+    physical_value, 0, 255, 1, 0, "ea" ;
+  }
+  Eop_Target_Spd_RPM_t {
+    physical_value, 0, 255, 20, 0, "RPM" ;
+  }
+  Eop_Torque_t {
+    physical_value, 0, 0, 0.02, 0, "Nm" ;
+  }
+  Eop_Version_t {
+    physical_value, 0, 255, 1, 0, "VER" ;
+  }
+  FaultStatus_t {
+    physical_value, 0, 1, 1, 0, "Flag" ;
+  }
+  GateDrv_UV_OV_t {
+    physical_value, 0, 1, 1, 0, "Flag" ;
+  }
+  Low_Current_t {
+    physical_value, 0, 1, 1, 0, "Flag" ;
+  }
+  Over_Current_t {
+    physical_value, 0, 1, 1, 0, "Flag" ;
+  }
+  Over_Temp_t {
+    physical_value, 0, 1, 1, 0, "Flag" ;
+  }
+  Over_Voltage_t {
+    physical_value, 0, 1, 1, 0, "Flag" ;
+  }
+  ProtectMode_t {
+    physical_value, 0, 1, 1, 0, "Flag" ;
+  }
+  Short_Circuit_t {
+    physical_value, 0, 1, 1, 0, "Flag" ;
+  }
+  Speed_Error_t {
+    physical_value, 0, 1, 1, 0, "Flag" ;
+  }
+  Under_Voltage_t {
+    physical_value, 0, 1, 1, 0, "Flag" ;
+  }
+  Warn_Temp_t {
+    physical_value, 0, 1, 1, 0, "Flag" ;
+  }
+}
+
+Signal_representation {
+  Eop_ActSpd_rpm_t: Eop_ActRotSpd_rpm ;
+  Eop_Comm_Error_t: Eop_Comm_Error ;
+  Eop_Current_DC_t: Eop_Current_DC ;
+  Eop_Current_Iq_t: Eop_Current_Iq ;
+  Eop_EEPROM_POPUP_t: Eop_EEPROM_POPUP ;
+  Eop_Target_Spd_RPM_t: Eop_Target_Spd_RPM ;
+  Eop_Torque_t: Eop_Torque ;
+  Eop_Version_t: Eop_Version ;
+  FaultStatus_t: Eop_FaultStatus ;
+  GateDrv_UV_OV_t: Eop_GateDrv_UV_OV ;
+  Low_Current_t: Eop_Low_Current ;
+  Over_Current_t: Eop_Over_Current ;
+  Over_Temp_t: Eop_Over_Temp ;
+  Over_Voltage_t: Eop_Over_Voltage ;
+  ProtectMode_t: Eop_ProtectMode ;
+  Short_Circuit_t: Eop_Short_Circuit ;
+  Speed_Error_t: Eop_Speed_Error ;
+  Under_Voltage_t: Eop_Under_Voltage ;
+  Warn_Temp_t: Eop_Warn_Temp ;
+}
