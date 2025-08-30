@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LDFParser.SubElements
 {
-    public class LDFScheduleTable : ILDFScheduleTable
+    public class LDFScheduleTable : ILdfScheduleTable
     {
         public string Name { get; set; } = "";
 

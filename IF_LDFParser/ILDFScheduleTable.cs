@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IF_LDFParser
 {
-    public interface ILDFScheduleTable
+    public interface ILdfScheduleTable
     {
         string Name { get; set; }
 

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LDFParser
 {
-    public class LDFParser
+    public class LDFParser : ILinParser
     {
         private sealed class EncodingType
         {
@@ -81,6 +81,7 @@ namespace LDFParser
                     }
                     else if (line.StartsWith("Diagnostic_signals"))
                     {
+                        // To do: Add code when Diagnostic is needed
                     }
                     else if (line.StartsWith("Frames"))
                     {
@@ -88,9 +89,11 @@ namespace LDFParser
                     }
                     else if (line.StartsWith("Diagnostic_frames"))
                     {
+                        // To do: Add code when Diagnostic is needed
                     }
                     else if (line.StartsWith("Node_attributes"))
                     {
+                        // To do: Add code when Diagnostic is needed
                     }
                     else if (line.StartsWith("Schedule_tables"))
                     {
@@ -620,6 +623,63 @@ namespace LDFParser
             }
         }
         #endregion
+
+
+        #region Interface
+        public List<string> GetAllNodeName()
+        {
+            List<string> node = new List<string>();
+
+            node.Add(_linMaster.Name);
+            node.AddRange(_slaves);
+
+            return node;
+        }
+        public List<ILdfLinFrame> GetAllLinFrame()
+        {
+            List<ILdfLinFrame> linFrames = new List<ILdfLinFrame>();
+
+            foreach (var frame in _linFramesDict)
+            {
+                linFrames.Add(frame.Value);
+            }
+
+            return linFrames;
+        }
+        public List<ILdfLinFrame> GetLinFrame(string nodeName)
+        {
+            if(
+                (_linMaster.Name != nodeName) &&
+                (_slaves.Contains(nodeName) == false)
+            ){
+                throw new Exception("Slave Name is invalid");
+            }
+
+            List<ILdfLinFrame> linFrames = new List<ILdfLinFrame>();
+
+            foreach (var frame in _linFramesDict)
+            {
+                if(frame.Value.Publisher == nodeName)
+                {
+                    linFrames.Add(frame.Value);
+                }
+            }
+
+            return linFrames;
+        }
+        public List<ILdfScheduleTable> GetScheduleTables()
+        {
+            List<ILdfScheduleTable> scheduleTables = new List<ILdfScheduleTable>();
+
+            foreach(var table in _scheduleTable)
+            {
+                scheduleTables.Add(table.Value);
+            }
+
+            return scheduleTables;
+        }
+        #endregion
+
 
         public string TestDebug()
         {
