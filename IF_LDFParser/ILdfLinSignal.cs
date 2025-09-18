@@ -12,11 +12,11 @@ namespace IF_LDFParser
         String Unit { get; set; }
         uint StartBit { get; set; }
         uint Length { get; set; }
-        ByteOrder byteOrder { get; set; }
-        ByteType byteType { get; set; }
-        double scale { get; set; }
-        double offset { get; set; }
-        double minValue { get; set; }
-        double maxValue { get; set; }
+        ByteOrder ByteOrder { get; set; }
+        ByteType ByteType { get; set; }
+        double Scale { get; set; }
+        double Offset { get; set; }
+        double MinValue { get; set; }
+        double MaxValue { get; set; }
     }
 }

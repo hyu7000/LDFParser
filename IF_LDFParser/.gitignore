@@ -1,4 +1,10 @@
-bin/
-obj/
-TestResults/
-.vs/
+.vs/**/*
+bin/**/*
+obj/**/*
+*.exe
+*.o
+*.out
+*.dll
+*.so
+*.a
+*.dylib

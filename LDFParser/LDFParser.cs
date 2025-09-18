@@ -187,12 +187,12 @@ namespace LDFParser
                     SignalName = signalName,
                     Length = length,
                     StartBit = 0,           // LDF Signals 블록에는 위치 정보 없음 (Frame에서 정의됨)
-                    byteOrder = ByteOrder.LittleEndian,
-                    byteType = ByteType.Unsigned,
-                    scale = 1.0,
-                    offset = 0.0,
-                    minValue = 0,
-                    maxValue = Math.Pow(2, length) - 1
+                    ByteOrder = ByteOrder.LittleEndian,
+                    ByteType = ByteType.Unsigned,
+                    Scale = 1.0,
+                    Offset = 0.0,
+                    MinValue = 0,
+                    MaxValue = Math.Pow(2, length) - 1
                 };
 
                 // Dictionary에 저장
@@ -305,12 +305,23 @@ namespace LDFParser
             string publisher = tokens[1].Trim();
             byte dlc = byte.Parse(tokens[2].Trim());
 
+            LinChecksumModel checksum = LinChecksumModel.Classic;
+            if(_protocol_version.Contains("2.1"))
+            {
+                checksum = LinChecksumModel.Enhanced;
+            }
+            else if (_protocol_version.Contains("2.0"))
+            {
+                checksum = LinChecksumModel.Enhanced;
+            }
+
             return new LDFLinFrame
             {
                 Name = name,
                 ID = id,
                 Publisher = publisher,
                 ByteLength = dlc,
+                Checksum = checksum
             };
         }
 
@@ -509,10 +520,10 @@ namespace LDFParser
                     {
                         if (_linSignalsDict.TryGetValue(sigName, out var sig))
                         {
-                            sig.minValue = enc.Min;
-                            sig.maxValue = enc.Max;
-                            sig.scale = enc.Scale;
-                            sig.offset = enc.Offset;
+                            sig.MinValue = enc.Min;
+                            sig.MaxValue = enc.Max;
+                            sig.Scale = enc.Scale;
+                            sig.Offset = enc.Offset;
                             sig.Unit = enc.Unit;
                         }
                         else
@@ -626,6 +637,14 @@ namespace LDFParser
 
 
         #region Interface
+        public string GetMasterName()
+        {
+            return _linMaster.Name;
+        }
+        public uint GetBaudRate()
+        {
+            return _baudRate;
+        }
         public List<string> GetAllNodeName()
         {
             List<string> node = new List<string>();
@@ -728,10 +747,10 @@ namespace LDFParser
             foreach (var signal in _linSignalsDict)
             {
                 sb.Append($"Signal : {signal.Value.SignalName}\n");
-                sb.Append($"-min : {signal.Value.minValue}\n");
-                sb.Append($"-max : {signal.Value.maxValue}\n");
-                sb.Append($"-offset : {signal.Value.offset}\n");
-                sb.Append($"-scale : {signal.Value.scale}\n");
+                sb.Append($"-min : {signal.Value.MinValue}\n");
+                sb.Append($"-max : {signal.Value.MaxValue}\n");
+                sb.Append($"-offset : {signal.Value.Offset}\n");
+                sb.Append($"-scale : {signal.Value.Scale}\n");
                 sb.Append($"-StartBit : {signal.Value.StartBit}\n");
                 sb.Append($"-Length : {signal.Value.Length}\n");
                 sb.Append($"-Unit : {signal.Value.Unit}\n");

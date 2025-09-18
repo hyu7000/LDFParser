@@ -8,6 +8,8 @@ namespace IF_LDFParser
 {
     public interface ILinParser
     {
+        string GetMasterName();
+        uint GetBaudRate();
         List<string> GetAllNodeName();
         List<ILdfLinFrame> GetAllLinFrame();
         List<ILdfLinFrame> GetLinFrame(string nodeName);
