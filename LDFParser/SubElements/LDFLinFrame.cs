@@ -20,7 +20,14 @@ namespace LDFParser.SubElements
         public Dictionary<string, ILdfLinSignal> Signals { get; set; } = new Dictionary<string, ILdfLinSignal>();
         public List<ILdfLinSignal> GetSignals()
         {
-            return new List<ILdfLinSignal>();
+            List<ILdfLinSignal> list = new List<ILdfLinSignal>();
+
+            foreach (var signal in Signals.Values)
+            { 
+                list.Add(signal);
+            }
+
+            return list;
         }
         public void AddSignal(ILdfLinSignal signal)
         {
