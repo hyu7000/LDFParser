@@ -39,6 +39,7 @@ namespace LDFParser
             _filePath = filePath;
 
             Parse();
+            AssignCycleTime();
         }
 
         private void Parse()
@@ -200,6 +201,23 @@ namespace LDFParser
             }
 
             return startIndex;
+        }
+
+        private void AssignCycleTime()
+        {
+            foreach(var table in _scheduleTable.Values)
+            {
+                foreach(var item in table.Schedule)
+                {
+                    string frameName = item.Item1;
+                    uint time = item.Item2;
+                    if (_linFramesDict.ContainsKey(frameName) == true)
+                    {
+                        LDFLinFrame frame = _linFramesDict[frameName];
+                        frame.CycleTime = (ushort)time;
+                    }
+                }
+            }
         }
 
         #region ParseFrame
