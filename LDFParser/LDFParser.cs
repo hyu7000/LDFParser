@@ -324,7 +324,11 @@ namespace LDFParser
             byte dlc = byte.Parse(tokens[2].Trim());
 
             LinChecksumModel checksum = LinChecksumModel.Classic;
-            if(_protocol_version.Contains("2.1"))
+            if (_protocol_version.Contains("2.2"))
+            {
+                checksum = LinChecksumModel.Enhanced;
+            }
+            else if (_protocol_version.Contains("2.1"))
             {
                 checksum = LinChecksumModel.Enhanced;
             }
