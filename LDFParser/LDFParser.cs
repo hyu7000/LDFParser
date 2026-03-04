@@ -7,10 +7,23 @@ namespace LDFParser
 {
     public class LDFParser : ILinParser
     {
+        [Flags]
+        private enum EncodingValueType
+        {
+            None = 0,
+            Physical = 1 << 0,         // 1
+            Logical = 1 << 1,          // 2
+            Both = Physical | Logical  // 3
+        }
+
         private sealed class EncodingType
         {
             public double Min, Max, Scale, Offset;
             public string Unit = "";
+
+            public EncodingValueType ValueType = EncodingValueType.None;
+
+            public Dictionary<int, string> LogicalValues { get; } = new(); 
         }
 
         private readonly string _filePath;
@@ -198,6 +211,11 @@ namespace LDFParser
 
                 // Dictionary에 저장
                 _linSignalsDict[signal.SignalName] = signal;
+
+                if(signal.SignalName == "ILCU_Trunk_Status")
+                {
+                    Console.WriteLine("");
+                }
             }
 
             return startIndex;
@@ -501,13 +519,43 @@ namespace LDFParser
                         _encodingTypes[currentType].Scale = scale;
                         _encodingTypes[currentType].Offset = offset;
                         _encodingTypes[currentType].Unit = unitPart.Trim().Trim('"');
+
+                        _encodingTypes[currentType].ValueType |= EncodingValueType.Physical;
                     }
+                }
+
+                // logical_value, <num>, "text" ;
+                if (currentType != null && line.StartsWith("logical_value", StringComparison.OrdinalIgnoreCase))
+                {
+                    string s = line.Trim().TrimEnd(';').Trim();
+
+                    // "logical_value," 제거
+                    int idx = s.IndexOf(',');
+                    if (idx < 0) continue;
+                    s = s.Substring(idx + 1).Trim();   // now: 0, "Default"
+
+                    // 첫 번째 콤마 기준으로 number / string 분리
+                    int comma = s.IndexOf(',');
+                    if (comma < 0) continue;
+
+                    string numPart = s.Substring(0, comma).Trim();
+                    string textPart = s.Substring(comma + 1).Trim();
+
+                    // textPart: "Default"
+                    textPart = textPart.Trim().Trim('"');
+
+                    if (int.TryParse(numPart, out int key))
+                    {
+                        _encodingTypes[currentType].LogicalValues[key] = textPart;
+                        _encodingTypes[currentType].ValueType |= EncodingValueType.Logical;
+                    }
+
+                    continue;
                 }
             }
 
             return startIndex; // 비정상 종료 시
         }
-
         #endregion
 
         #region ParseSignalRepresentation
@@ -542,11 +590,28 @@ namespace LDFParser
                     {
                         if (_linSignalsDict.TryGetValue(sigName, out var sig))
                         {
-                            sig.MinValue = enc.Min;
-                            sig.MaxValue = enc.Max;
-                            sig.Scale = enc.Scale;
-                            sig.Offset = enc.Offset;
-                            sig.Unit = enc.Unit;
+                            switch(enc.ValueType)
+                            {
+                                case EncodingValueType.Logical:
+                                    sig.LogicalValues = new Dictionary<int, string>(enc.LogicalValues);
+                                    break;
+                                case EncodingValueType.Physical:
+                                    sig.MinValue = enc.Min;
+                                    sig.MaxValue = enc.Max;
+                                    sig.Scale = enc.Scale;
+                                    sig.Offset = enc.Offset;
+                                    sig.Unit = enc.Unit;
+                                    break;
+                                case EncodingValueType.Both:
+                                    sig.MinValue = enc.Min;
+                                    sig.MaxValue = enc.Max;
+                                    sig.Scale = enc.Scale;
+                                    sig.Offset = enc.Offset;
+                                    sig.Unit = enc.Unit;
+
+                                    sig.LogicalValues = new Dictionary<int, string>(enc.LogicalValues);
+                                    break;
+                            }
                         }
                         else
                         {
@@ -656,7 +721,6 @@ namespace LDFParser
             }
         }
         #endregion
-
 
         #region Interface
         public string GetMasterName()

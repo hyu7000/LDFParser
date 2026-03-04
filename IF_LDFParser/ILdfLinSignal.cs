@@ -18,5 +18,6 @@ namespace IF_LDFParser
         double Offset { get; set; }
         double MinValue { get; set; }
         double MaxValue { get; set; }
+        Dictionary<int, string> LogicalValues { get; set; }
     }
 }

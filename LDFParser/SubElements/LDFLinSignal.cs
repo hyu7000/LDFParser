@@ -19,5 +19,6 @@ namespace LDFParser.SubElements
         public double Offset { get; set; }
         public double MinValue { get; set; }
         public double MaxValue { get; set; }
+        public Dictionary<int, string> LogicalValues { get; set; } = new();
     }
 }
