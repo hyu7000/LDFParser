@@ -15,9 +15,8 @@ namespace TestCase_LDFParser
             string relativePath = @"MCU_EOP1_LIN_Controller.ldf";
             string basePath = AppDomain.CurrentDomain.BaseDirectory; // 실행 파일 기준 경로
 
-            // 절대 경로 생성
-            //string absolutePath = Path.Combine(basePath, relativePath);
-            string absolutePath = "C:\\Users\\hkpark\\Desktop\\1_Project\\50_Ref_Project\\SL-Lin-이호석 선임\\26_02_25_Lin 송수신 테스트\\SL_Project\\LIN2_2_ILCU_LX3_2024.08.07_ILCU_DWL_USM_Info[4Bit]_RC_Signal_encoding_types.ldf";
+            // 절대 경로 생성 (출력 폴더로 복사되는 커밋된 픽스처)
+            string absolutePath = Path.Combine(basePath, relativePath);
 
             _parser = new LDFParser.LDFParser(absolutePath);
         }
